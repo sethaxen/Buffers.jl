@@ -13,9 +13,12 @@ julia:
 notifications:
   email: false
 
+script:
+    - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+    - julia --optimize=0 --project -e 'using Pkg; Pkg.build(); Pkg.test(; coverage=true)';
+
 jobs:
   allow_failures:
     - julia: nightly
 after_success:
-  - julia --project=test/coverage -e 'using Pkg; Pkg.instantiate()'
-  - julia --project=test/coverage test/coverage/coverage.jl
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'

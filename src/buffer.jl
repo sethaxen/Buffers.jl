@@ -39,8 +39,7 @@ mutable struct Buffer{T,A<:AbstractArray{T}}
   freeze::Bool
 end
 
-Buffer(xs::AbstractArray, args...) =
-  Buffer(similar(xs, args...), false)
+Buffer(xs::AbstractArray, args...) = Buffer(similar(xs, args...), false)
 
 bufferfrom(xs::AbstractArray) = Buffer(xs, false)
 
@@ -88,7 +87,9 @@ end
 grad_mut(b::Buffer) = fill!(similar(b.data, Any), nothing)
 grad_mut(b::Buffer{T}) where T<:Number = fill!(similar(b.data, float(T)), 0)
 
-_pullback(cx::AContext, ::typeof(Buffer), args...) = Buffer(args...), _ -> nothing
+function ZygoteRules._pullback(cx::AContext, ::typeof(Buffer), args...)
+  Buffer(args...), _ -> nothing
+end
 
 @adjoint function getindex(b::Buffer, i...)
   b[i...], function (Δ)
@@ -128,8 +129,12 @@ end
   end
 end
 
-_pullback(cx::AContext, ::typeof(Broadcast.materialize!), b::Buffer, x::AbstractArray) =
-  _pullback(cx, copyto!, b, x)
+function ZygoteRules._pullback(cx::AContext,
+                               ::typeof(Broadcast.materialize!),
+                               b::Buffer,
+                               x::AbstractArray)
+  ZygoteRules._pullback(cx, copyto!, b, x)
+end
 
 @adjoint function copy(b::Buffer)
   copy(b), function (b̄)

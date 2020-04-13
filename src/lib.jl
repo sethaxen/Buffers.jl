@@ -10,3 +10,9 @@ function grad_mut(cx::AContext, x)
     ch[x] = grad_mut(x)
   end
 end
+
+accum(x, y) =
+  x === nothing ? y :
+  y === nothing ? x :
+  x + y
+accum(x::AbstractArray, y::AbstractArray) = accum.(x, y)

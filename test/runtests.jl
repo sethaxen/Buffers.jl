@@ -19,14 +19,17 @@ using Test
 
   @test gradient(x -> sum(vstack(x)), [1, 2, 3]) == ([5, 5, 5],)
 
-  buf = Buffer([1, 2, 3])
+  buf = Buffer([0, 1, 2, 3])
+  @test size(buf) === (4, )
+  @test deleteat!(buf, 1) === buf
+  @test size(buf) === (3, )
   buf[1] = 1
   copy(buf)
+  @test_throws ErrorException deleteat!(buf, 1)
   @test_throws ErrorException buf[1] = 1
   @test eltype(buf) === Int
   @test length(buf) === 3
   @test ndims(buf) === 1
-  @test size(buf) === (3, )
   @test size(buf, 2) === 1
   @test axes(buf) == (1:3, )
   @test axes(buf, 2) == 1:1

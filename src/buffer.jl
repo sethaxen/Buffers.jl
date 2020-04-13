@@ -1,9 +1,3 @@
-using MacroTools: @forward
-using ZygoteRules
-using ZygoteRules: AContext
-
-import ZygoteRules: _pullback
-
 """
     Buffer(xs, ...)
 

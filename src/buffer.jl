@@ -80,7 +80,7 @@ Base.IteratorSize(::Type{<:Buffer{<:Any, A}}) where {A} = Base.IteratorSize(A)
 function Base.iterate(b::Buffer, state=(eachindex(b),))
   y = iterate(state...)
   y === nothing && return nothing
-  b[y[1]], (state[1], tail(y)...)
+  b[y[1]], (state[1], Base.tail(y)...)
 end
 
 grad_mut(b::Buffer) = fill!(similar(b.data, Any), nothing)

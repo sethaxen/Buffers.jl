@@ -44,7 +44,22 @@ using Zygote
             return copy(buf)
         end
 
+        function _scaledpairedcumsum(xs)
+            n = length(xs)
+            n > 0 || return copy(xs)
+            buf = Buffer(xs)
+            buf[1:2] = xs[1:2]
+            for i in 3:2:(n - 1)
+                buf[i:(i + 1)] = buf[(i - 2):(i - 1)] + i * xs[i:(i + 1)]
+            end
+            return copy(buf)
+        end
+
         @test gradient(x -> sum(vstack(x)), [1, 2, 3]) == ([5, 5, 5],)
+
+        @test Zygote.pullback(_scaledpairedcumsum, 1:4)[2]([0, 0, 0, 1]) == ([0, 1, 0, 3],)
+        @test Zygote.pullback(_scaledpairedcumsum, 1:4)[2]([0, 0, 1, 0]) == ([1, 0, 3, 0],)
+        @test Zygote.pullback(_scaledpairedcumsum, 1:4)[2]([1, 1, 1, 1]) == ([2, 2, 3, 3],)
 
         buf = Buffer([1, 2, 3])
         buf[1] = 1

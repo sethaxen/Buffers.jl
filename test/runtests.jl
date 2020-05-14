@@ -76,7 +76,7 @@ using Zygote
         @test stride(buf, 2) === 3
         @test strides(buf) === (1,)
         @test collect(buf) == collect(copy(buf))
-        @test Base.IteratorSize(b) == Base.IteratorSize([1, 2, 3])
+        @test Base.IteratorSize(buf) == Base.IteratorSize([1, 2, 3])
 
         @test gradient([1, 2, 3]) do xs
             b = Buffer(xs)
